@@ -230,7 +230,8 @@ router.ws('/connect', async (ws, req) => {
                         } finally {
                             await job.cleanup();
                         }
-                        ws.close(4999, 'Job Completed'); // Will not execute if an error is thrown above
+                        // ws.close(4999, 'Job Completed'); // Will not execute if an error is thrown above
+                        job = null;
                     } else {
                         ws.close(4000, 'Already Initialized');
                     }
@@ -240,10 +241,10 @@ router.ws('/connect', async (ws, req) => {
                         if (msg.stream === 'stdin') {
                             event_bus.emit('stdin', msg.data);
                         } else {
-                            ws.close(4004, 'Can only write to stdin');
+                            // ws.close(4004, 'Can only write to stdin');
                         }
                     } else {
-                        ws.close(4003, 'Not yet initialized');
+                        // ws.close(4003, 'Not yet initialized');
                     }
                     break;
                 case 'signal':
@@ -268,7 +269,7 @@ router.ws('/connect', async (ws, req) => {
     setTimeout(() => {
         //Terminate the socket after 1 second, if not initialized.
         if (job === null) ws.close(4001, 'Initialization Timeout');
-    }, 1000);
+    }, 600000);
 });
 
 router.post('/execute', async (req, res) => {
